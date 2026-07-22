@@ -1,0 +1,51 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>夜栖协议 · 创作后台 MVP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="creator">
+  <div class="shell" id="creator-app">
+    <header class="topbar">
+      <div class="brand"><div class="logo">夜</div><div class="brand-copy"><small>CREATOR CONSOLE</small><h1>创作后台 · 可创建版</h1></div></div>
+      <nav class="nav"><a href="index.html" data-nav="home">首页</a><a href="chat.html" data-nav="chat">沉浸聊天</a><a href="characters.html" data-nav="characters">角色库</a><a href="creator.html" data-nav="creator">创作后台</a></nav>
+    </header>
+
+    <section class="creator-layout">
+      <article class="panel">
+        <div class="kicker">Create Character</div>
+        <form id="creator-form" class="creator-form">
+          <div class="field"><label>角色名</label><input id="field-name" required placeholder="例如：曜川" /></div>
+          <div class="field"><label>角色标题</label><input id="field-title" required placeholder="例如：清醒克制的年上策士" /></div>
+          <div class="field"><label>一句卖点</label><input id="field-tagline" required placeholder="例如：越冷静，越会失控" /></div>
+          <div class="field"><label>角色路线</label><select id="field-archetype"><option>高压拉扯</option><option>安全沉迷</option><option>慢热上头</option><option>年上掌控</option><option>危险救赎</option></select></div>
+          <div class="field"><label>世界观</label><input id="field-world" required placeholder="例如：近未来浮城 / 灯海议会" /></div>
+          <div class="field"><label>当前情绪</label><input id="field-mood" required placeholder="例如：克制审视" /></div>
+          <div class="field field-wide"><label>角色简介</label><textarea id="field-intro" required placeholder="一句到两句，写清这条线为什么上头。"></textarea></div>
+          <div class="field field-wide"><label>性格标签</label><input id="field-traits" placeholder="用中文逗号分隔，例如：冷静，护短，控制欲" /></div>
+          <div class="field field-wide"><label>快捷话术</label><input id="field-quick" placeholder="用中文逗号分隔，例如：你在躲我吗，你今天累不累" /></div>
+          <div class="field field-wide"><label>名场面</label><input id="field-scenes" placeholder="用中文逗号分隔，例如：夜雨送伞，会议室对峙" /></div>
+          <div class="field field-wide"><label>适配用户</label><input id="field-fit" placeholder="用中文逗号分隔，例如：喜欢年上，喜欢拉扯" /></div>
+          <div class="action-row"><button class="btn btn-primary" type="submit">保存角色</button><span id="creator-status" class="muted">保存后会同步出现在角色库和聊天页。</span></div>
+        </form>
+      </article>
+
+      <aside class="panel">
+        <div class="kicker">运营提示</div>
+        <div class="feature-list">
+          <div class="feature-item">先把角色卖点写清，再写剧情，不然容易变成普通聊天壳。</div>
+          <div class="feature-item">快捷话术建议围绕：关心、试探、占有、承诺、离开风险。</div>
+          <div class="feature-item">每个角色至少要有 2 个可截图传播的名场面。</div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="section-title"><h2>我创建的角色</h2></div>
+    <section id="creator-character-list" class="cards"></section>
+    <p class="footer">说明：这里创建的角色只保存在当前浏览器本地，但会直接联动聊天页和角色库。</p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

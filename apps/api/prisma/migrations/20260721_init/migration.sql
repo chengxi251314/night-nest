@@ -1,0 +1,2 @@
+﻿-- Prisma initial migration draft
+-- Generated on 2026-07-21 for Night Nest

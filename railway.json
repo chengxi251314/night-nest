@@ -1,0 +1,10 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "cd apps/api && node ../../node_modules/typescript/bin/tsc -p tsconfig.json && cd ../web && node ../../node_modules/next/dist/bin/next build"
+  },
+  "deploy": {
+    "startCommand": "node deploy.js",
+    "healthcheckPath": "/health"
+  }
+}

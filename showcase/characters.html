@@ -1,0 +1,56 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>夜栖协议 · 角色库 MVP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="characters">
+  <div class="shell" id="characters-app">
+    <header class="topbar">
+      <div class="brand"><div class="logo">夜</div><div class="brand-copy"><small>CHARACTER LIBRARY</small><h1>角色库 · 动态版</h1></div></div>
+      <nav class="nav"><a href="index.html" data-nav="home">首页</a><a href="chat.html" data-nav="chat">沉浸聊天</a><a href="characters.html" data-nav="characters">角色库</a><a href="creator.html" data-nav="creator">创作后台</a></nav>
+    </header>
+
+    <div class="section-title"><h2>角色筛选</h2><a class="btn btn-secondary" href="chat.html">进入试玩</a></div>
+    <div class="badge-row" style="margin-bottom:14px;">
+      <button class="filter-btn active" type="button" data-filter="all">全部</button>
+      <button class="filter-btn" type="button" data-filter="高压拉扯">高压拉扯</button>
+      <button class="filter-btn" type="button" data-filter="安全沉迷">安全沉迷</button>
+      <button class="filter-btn" type="button" data-filter="慢热上头">慢热上头</button>
+      <button class="filter-btn" type="button" data-filter="custom">我创建的</button>
+    </div>
+
+    <section id="character-grid" class="character-grid"></section>
+
+    <div class="section-title"><h2>角色详情面板</h2></div>
+    <section class="detail-grid">
+      <article class="panel">
+        <div class="kicker">Character Detail</div>
+        <div class="detail-portrait"><img id="detail-portrait" src="assets/luoyin-card.png" alt="角色立绘大图" /></div>
+        <h2 id="detail-name" style="margin:0 0 8px;">洛因</h2>
+        <div id="detail-title" class="muted">危险而克制的魅魔独行者</div>
+        <div id="detail-stage" style="margin-top:12px;color:#ffd78a;">偏爱期 · 高压拉扯</div>
+        <div id="detail-source" class="muted" style="margin-top:10px;">内置角色</div>
+        <p id="detail-intro" class="muted" style="margin-top:16px;">高压拉扯、边界试探、慢热失守，是这条线最上头的地方。</p>
+        <div class="feature-list" style="margin-top:18px;">
+          <div class="feature-item"><strong>世界观</strong><div id="detail-world" class="muted">魔域边境 / 雾潮王庭</div></div>
+          <div class="feature-item"><strong>性格标签</strong><div id="detail-traits" class="tags" style="margin-top:10px;"></div></div>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="kicker">适配用户</div>
+        <div id="detail-fit" class="feature-list"></div>
+        <div class="kicker" style="margin-top:18px;">推荐名场面</div>
+        <div id="detail-scenes" class="feature-list"></div>
+        <div class="actions" style="margin-top:18px;"><a id="detail-play" class="btn btn-primary" href="chat-luoyin.html">立即试玩这条线</a></div>
+      </article>
+    </section>
+
+    <p class="footer">角色库现在会动态读取内置角色和你在后台创建的角色。</p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
+

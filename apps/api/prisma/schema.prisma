@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  createdAt          DateTime            @default(now())
+  conversations      Conversation[]
+  relationshipStates RelationshipState[]
+  memoryEntries      MemoryEntry[]
+  writebacks         AiWriteback[]
+}
+
+model Character {
+  id                 String              @id
+  name               String
+  title              String
+  world              String
+  createdAt          DateTime            @default(now())
+  conversations      Conversation[]
+  relationshipStates RelationshipState[]
+  memoryEntries      MemoryEntry[]
+  storyNodes         StoryNode[]
+  storyTriggers      StoryTrigger[]
+  writebacks         AiWriteback[]
+}
+
+model Conversation {
+  id          String       @id @default(cuid())
+  userId      String
+  characterId String
+  status      String       @default("active")
+  createdAt   DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id])
+  character   Character    @relation(fields: [characterId], references: [id])
+  messages    Message[]
+
+  @@index([userId, characterId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId, createdAt])
+}
+
+model RelationshipState {
+  id          String    @id @default(cuid())
+  userId      String
+  characterId String
+  score       Int       @default(0)
+  stage       String
+  mood        String
+  updatedAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id])
+
+  @@unique([userId, characterId])
+}
+
+model MemoryEntry {
+  id          String    @id @default(cuid())
+  userId      String
+  characterId String
+  summary     String
+  weight      Int       @default(1)
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id])
+
+  @@index([userId, characterId, createdAt])
+}
+
+model StoryNode {
+  id           String       @id
+  characterId  String
+  title        String
+  body         String
+  chapterOrder Int
+  character    Character    @relation(fields: [characterId], references: [id])
+  triggers     StoryTrigger[]
+
+  @@index([characterId, chapterOrder])
+}
+
+model StoryTrigger {
+  id             String    @id
+  characterId    String
+  storyNodeId    String
+  triggerType    String
+  conditionKey   String
+  conditionValue String
+  createdAt      DateTime  @default(now())
+  character      Character @relation(fields: [characterId], references: [id])
+  storyNode      StoryNode @relation(fields: [storyNodeId], references: [id])
+
+  @@index([characterId, triggerType])
+}
+
+model AiWriteback {
+  id                String    @id @default(cuid())
+  userId            String
+  characterId       String
+  conversationId    String?
+  relationshipDelta Int       @default(0)
+  memorySummary     String?
+  triggeredNodeId   String?
+  createdAt         DateTime  @default(now())
+  user              User      @relation(fields: [userId], references: [id])
+  character         Character @relation(fields: [characterId], references: [id])
+
+  @@index([userId, characterId, createdAt])
+}

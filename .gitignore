@@ -1,0 +1,11 @@
+node_modules/
+.venv/
+dist/
+.next/
+.env
+*.db
+*.log
+.tmp/
+.runlogs/
+prisma-error.txt
+.tmp_patch_jump.ps1

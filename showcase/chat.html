@@ -1,0 +1,84 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>夜栖协议 · 聊天闭环 MVP</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="chat">
+  <div class="shell" id="chat-app">
+    <header class="topbar">
+      <div class="brand"><div class="logo">夜</div><div class="brand-copy"><small>CHAT LOOP MVP</small><h1>沉浸聊天 · 可推进版</h1></div></div>
+      <nav class="nav"><a href="index.html" data-nav="home">首页</a><a href="chat.html" data-nav="chat">沉浸聊天</a><a href="characters.html" data-nav="characters">角色库</a><a href="creator.html" data-nav="creator">创作后台</a></nav>
+    </header>
+
+    <section class="layout-chat">
+      <aside class="panel side-list">
+        <div class="kicker">Character Switch</div>
+        <div id="chat-character-list" class="side-list"></div>
+        <article class="sticky-panel">
+          <div class="kicker">路线标签</div>
+          <div id="route-mode" class="pill hot">高压拉扯 · 越克制，越上头</div>
+          <div id="route-source" class="muted" style="margin-top:10px;">内置角色 · 本地存档已开启</div>
+          <div class="actions" style="margin-top:14px;"><button id="reset-chat" class="btn btn-secondary" type="button">重置当前角色进度</button></div>
+        </article>
+      </aside>
+
+      <main class="panel chat-window">
+        <div class="chat-head">
+          <div class="kicker">Current Route</div>
+          <h2 id="char-name">洛因</h2>
+          <div id="char-title" class="muted">危险而克制的魅魔独行者</div>
+          <div id="char-meta" class="mini-tags" style="margin-top:10px;color:#ffd78a;">偏爱期 · 克制松动 · 魔域边境 / 雾潮王庭</div>
+          <div id="typing-status" class="muted" style="margin-top:10px;">角色在线 · 可继续推进关系</div>
+        </div>
+        <div id="messages" class="messages"></div>
+        <div class="chat-foot">
+          <div class="kicker">Quick Actions</div>
+          <div id="quick" class="quick"></div>
+          <form id="composer" class="composer" style="margin-top:14px;">
+            <textarea placeholder="输入你想对他说的话……"></textarea>
+            <button class="btn btn-primary" type="submit">发送</button>
+          </form>
+        </div>
+      </main>
+
+      <aside class="side-list">
+        <article class="subpanel">
+          <div class="kicker">Relationship</div>
+          <div class="score"><strong>关系值</strong><span id="score-val">68</span></div>
+          <div class="scorebar" style="margin-top:12px;"><span id="score-bar" style="width:68%"></span></div>
+          <div class="meter">
+            <div><small>信任度 <span id="trust-val">61</span></small><div class="meter-track"><span id="trust-bar" style="width:61%"></span></div></div>
+            <div><small>暧昧张力 <span id="desire-val">83</span></small><div class="meter-track"><span id="desire-bar" style="width:83%"></span></div></div>
+            <div><small>占有倾向 <span id="jealousy-val">47</span></small><div class="meter-track"><span id="jealousy-bar" style="width:47%"></span></div></div>
+          </div>
+          <div id="chapter-progress" class="muted" style="margin-top:14px;">已解锁 1 / 3 章节</div>
+        </article>
+
+        <article class="subpanel">
+          <div class="kicker">Chapter Route</div>
+          <div id="chapter-list" class="chapter-list"></div>
+        </article>
+
+        <article class="subpanel">
+          <div class="kicker">Current Story Node</div>
+          <h3 id="story-title" style="margin:0 0 10px;">第 01 章 · 夜色试探</h3>
+          <p id="story-body" class="muted">第一步不是进攻，而是让他确认你不会把靠近当成游戏。</p>
+          <div id="choice-list" class="choice-list"></div>
+        </article>
+
+        <article class="subpanel">
+          <div class="kicker">当前立绘</div>
+          <div class="chat-portrait"><img id="chat-portrait" src="assets/luoyin-card.png" alt="当前角色立绘" /><div class="portrait-copy"><strong id="portrait-name">洛因</strong><div class="muted" id="portrait-tagline">越克制，越上头</div></div></div>
+        </article>
+
+        <article class="subpanel"><div class="kicker">Key Memories</div><ul id="memories" class="muted"></ul></article>
+      </aside>
+    </section>
+    <p class="footer">说明：现在支持多轮聊天、剧情选择、章节解锁、关系变化、本地存档。</p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

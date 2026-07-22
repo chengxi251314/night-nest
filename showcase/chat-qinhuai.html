@@ -1,0 +1,77 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>夜栖协议 · 秦淮专属路线</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-page="chat" data-chat-character="qinhuai" data-chat-solo="true" class="theme-qinhuai">
+  <div class="shell" id="chat-app">
+    <header class="topbar">
+      <div class="brand"><div class="logo">夜</div><div class="brand-copy"><small>SOLO ROUTE</small><h1>秦淮 · 专属聊天界面</h1></div></div>
+      <nav class="nav"><a href="index.html" data-nav="home">首页</a><a href="chat.html" data-nav="chat">聊天总览</a><a href="characters.html" data-nav="characters">角色库</a><a href="creator.html" data-nav="creator">创作后台</a></nav>
+    </header>
+
+    <section class="solo-layout">
+      <aside class="panel side-list solo-side">
+        <div class="kicker">Character Route</div>
+        <div class="detail-portrait"><img src="assets/qinhuai-card.png" alt="秦淮立绘卡面" /></div>
+        <h2 style="margin:0;">秦淮</h2>
+        <div class="muted solo-copy">冷感天才与迟到的心动</div>
+        <div class="pill hot">慢热上头 · 高行动反馈</div>
+        <p class="route-note">这条线主打理性失衡、低表达高行动、慢热回报。</p>
+        <div class="info-grid">
+          <div class="info-chip">独立页面体验</div>
+          <div class="info-chip">专属路线跳转</div>
+          <div class="info-chip">本地存档保留</div>
+          <div class="info-chip">章节推进闭环</div>
+        </div>
+        <div class="kicker" style="margin-top:18px;">这条线适合谁</div>
+        <div class="route-note">适合喜欢高智感、慢热攻略、行动派反馈的用户。</div>
+        <div class="kicker" style="margin-top:18px;">切换其他路线</div>
+        <div id="chat-character-list" class="route-jumps"></div>
+      </aside>
+
+      <main class="panel chat-window">
+        <div class="chat-head">
+          <div class="kicker">Current Route</div>
+          <h2 id="char-name">秦淮</h2>
+          <div id="char-title" class="muted">冷感天才与迟到的心动</div>
+          <div id="char-meta" class="mini-tags" style="margin-top:10px;color:#ffd78a;">专属人物页 · 独立聊天 UI</div>
+          <div id="typing-status" class="muted" style="margin-top:10px;">角色在线 · 可继续推进关系</div>
+        </div>
+        <div id="messages" class="messages"></div>
+        <div class="chat-foot">
+          <div class="kicker">Quick Actions</div>
+          <div id="quick" class="quick"></div>
+          <form id="composer" class="composer" style="margin-top:14px;">
+            <textarea placeholder="输入你想对 秦淮 说的话……"></textarea>
+            <button class="btn btn-primary" type="submit">发送</button>
+          </form>
+        </div>
+      </main>
+
+      <aside class="side-list">
+        <article class="subpanel">
+          <div class="kicker">Relationship</div>
+          <div class="score"><strong>关系值</strong><span id="score-val">0</span></div>
+          <div class="scorebar" style="margin-top:12px;"><span id="score-bar" style="width:0%"></span></div>
+          <div class="meter">
+            <div><small>信任度 <span id="trust-val">0</span></small><div class="meter-track"><span id="trust-bar" style="width:0%"></span></div></div>
+            <div><small>暧昧张力 <span id="desire-val">0</span></small><div class="meter-track"><span id="desire-bar" style="width:0%"></span></div></div>
+            <div><small>占有倾向 <span id="jealousy-val">0</span></small><div class="meter-track"><span id="jealousy-bar" style="width:0%"></span></div></div>
+          </div>
+          <div id="chapter-progress" class="muted" style="margin-top:14px;">已解锁 1 / 3 章节</div>
+        </article>
+        <article class="subpanel"><div class="kicker">Chapter Route</div><div id="chapter-list" class="chapter-list"></div></article>
+        <article class="subpanel"><div class="kicker">Current Story Node</div><h3 id="story-title" style="margin:0 0 10px;">剧情节点</h3><p id="story-body" class="muted">剧情说明</p><div id="choice-list" class="choice-list"></div></article>
+        <article class="subpanel"><div class="kicker">当前立绘</div><div class="chat-portrait"><img id="chat-portrait" src="assets/qinhuai-card.png" alt="当前角色立绘" /><div class="portrait-copy"><strong id="portrait-name">秦淮</strong><div class="muted" id="portrait-tagline">慢热上头 · 高行动反馈</div></div></div></article>
+        <article class="subpanel"><div class="kicker">Key Memories</div><ul id="memories" class="muted"></ul></article>
+      </aside>
+    </section>
+    <p class="footer">这是 秦淮 的独立聊天界面。你现在可以直接在不同角色页之间跳转。</p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

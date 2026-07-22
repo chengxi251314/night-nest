@@ -1,0 +1,21 @@
+{
+  "name": "night-nest",
+  "private": true,
+  "version": "0.2.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace @night-nest/web run dev",
+    "dev:api": "npm --workspace @night-nest/api run build && npm --workspace @night-nest/api run start",
+    "dev:ai": "uvicorn app.main:app --reload --app-dir apps/ai",
+    "build:web": "npm --workspace @night-nest/web run build",
+    "build:api": "npm --workspace @night-nest/api run build",
+    "prisma:generate": "npm --workspace @night-nest/api run prisma:generate",
+    "prisma:seed": "npm --workspace @night-nest/api run prisma:seed",
+    "db:setup": "python scripts/setup-db.py",
+    "lint": "echo lint to be configured",
+    "test": "echo tests to be configured"
+  }
+}
