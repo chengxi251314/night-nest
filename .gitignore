@@ -1,11 +1,13 @@
 node_modules/
 .venv/
-dist/
 .next/
 .env
-*.db
 *.log
 .tmp/
 .runlogs/
 prisma-error.txt
 .tmp_patch_jump.ps1
+apps/api/node_modules/
+apps/web/node_modules/
+apps/web/.next/
+apps/ai/.venv/
