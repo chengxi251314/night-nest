@@ -1,10 +1,14 @@
 {
   "build": {
     "builder": "nixpacks",
-    "buildCommand": "cd apps/api && node ../../node_modules/typescript/bin/tsc -p tsconfig.json && cd ../web && node ../../node_modules/next/dist/bin/next build"
+    "buildCommand": "npm install && cd apps/api && npx prisma generate && npx tsc -p tsconfig.json",
+    "config": {
+      "node": { "version": "22" }
+    }
   },
   "deploy": {
-    "startCommand": "node deploy.js",
-    "healthcheckPath": "/health"
+    "startCommand": "node apps/api/dist/apps/api/src/main.js",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "ON_FAILURE"
   }
 }
