@@ -33,11 +33,7 @@ export default function AuthButton() {
 
   return (
     <div style={{ position: "relative" }}>
-      <button onClick={() => setShowForm(!showForm)} style={{
-        padding: "7px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600,
-        background: "linear-gradient(135deg, rgba(143,124,255,0.2), rgba(255,142,199,0.15))",
-        border: "1px solid rgba(143,124,255,0.2)", color: "#fff"
-      }}>登录</button>
+      <button onClick={() => setShowForm(!showForm)} style={{ padding: "7px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, background: "linear-gradient(135deg, rgba(143,124,255,0.2), rgba(255,142,199,0.15))", border: "1px solid rgba(143,124,255,0.2)", color: "#fff" }}>登录</button>
       {showForm && (
         <div onClick={() => setShowForm(false)} style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "rgba(20,20,50,0.98)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: 28, width: 320, maxWidth: "90vw", backdropFilter: "blur(40px)", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>

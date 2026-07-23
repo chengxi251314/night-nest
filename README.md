@@ -1,19 +1,44 @@
-# Night Nest
+# Night Nest 夜栖协议
 
-鐎圭偟骞囩亸杈╁崕妞ゅ湱娲版銊︾仸閿涘本妫╅張鐔风唨缁惧尅绱?026-07-21閵?
-## 瑜版挸澧犵€瑰本鍨氭惔?
-- Web閿涙瓊ext.js 妞ょ敻娼版銊︾仸
-- API閿涙瓊estJS 妞嬪孩鐗稿Ο鈥虫健娑撳孩甯堕崚璺烘珤/閺堝秴濮?娴犳挸鍋?- AI閿涙astAPI 缂傛牗甯撻崗銉ュ經
-- DB閿涙瓍risma schema閵嗕沟igration 閻╊喖缍嶉妴涔籩ed 閻╊喖缍嶉妴涓糛Lite 瀵偓閸欐垶鏆熼幑顔肩氨
-- Docs閿涙艾鎯庨崝銊ｂ偓浣界讣缁夋眹鈧礁娲栭崘娆嶁偓浣风波閸屻劋绗岄梻顓犲箚鐠囧瓨妲?
-## 閺堫剙婀撮崥顖氬З妞ゅ搫绨?
-1. 婢跺秴鍩?`.env.example` 娑?`.env`
-2. 鐎瑰顥婃笟婵婄
-3. 鏉╂劘顢?`npm run prisma:generate`
-4. 鏉╂劘顢?`npm run prisma:migrate`
-5. 鏉╂劘顢?`npm run prisma:seed`
-6. 閸掑棗鍩嗛崥顖氬З Web / API / AI 閺堝秴濮?
-## 瑜版挸澧犻梽鎰煑
+AI 角色关系平台——不止是聊天，是可持续推进关系、剧情与情绪价值的角色互动体验。
 
-- 瑜版挸澧犳妯款吇閺?SQLite 瀵偓閸欐垶膩瀵骏绱濋柅鍌氭値閺堫剙婀村鈧崣鎴濇嫲 MVP 妤犲矁鐦?- 閸氬海鐢绘潻娑樺弳婢舵矮姹夊ù瀣槸閹存牗顒滃蹇庣瑐缁炬寧妞傞敍灞界紦鐠侇喖鍨忛崶?PostgreSQL
+## 技术栈
 
+| 层 | 技术 |
+|---|---|
+| 前端 | Next.js 15 + React 19 + Framer Motion + Lucide Icons |
+| 后端 | NestJS + Prisma + SQLite |
+| AI | FastAPI + OpenAI 兼容接口（DeepSeek 等） |
+
+## 功能
+
+- **沉浸聊天** — 4 个角色，每人独立人格 AI prompt，关系数值推进，记忆沉淀
+- **剧本大厅** — 创建/加入公开剧本，多人同场景互动
+- **角色库** — 角色详情编辑，立绘管理
+- **创作者后台** — 数据看板，角色关系阶段分布，商业化漏斗
+- **用户系统** — 注册/登录/会话管理
+- **自定义模型** — 接入任意 OpenAI 兼容 API
+
+## 启动
+
+```powershell
+# 一键启动三服务
+.\start.ps1
+```
+
+- Web: `http://localhost:3000`
+- API: `http://localhost:3100/health`
+- AI: `http://localhost:8000/v1/pipeline-status`
+
+## 项目结构
+
+```
+night-nest/
+├── apps/
+│   ├── web/          # Next.js 前端
+│   ├── api/          # NestJS 后端
+│   └── ai/           # FastAPI AI 服务
+├── packages/         # 共享类型
+├── scripts/          # 数据库脚本
+└── showcase/         # 早期展示版
+```

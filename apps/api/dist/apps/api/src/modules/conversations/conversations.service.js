@@ -14,15 +14,18 @@ const common_1 = require("@nestjs/common");
 const conversations_repository_1 = require("../../database/repositories/conversations.repository");
 const relationships_repository_1 = require("../../database/repositories/relationships.repository");
 const memories_repository_1 = require("../../database/repositories/memories.repository");
+const prisma_service_1 = require("../../database/prisma.service");
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 let ConversationsService = class ConversationsService {
     conversationsRepository;
     relationshipsRepository;
     memoriesRepository;
-    constructor(conversationsRepository, relationshipsRepository, memoriesRepository) {
+    prisma;
+    constructor(conversationsRepository, relationshipsRepository, memoriesRepository, prisma) {
         this.conversationsRepository = conversationsRepository;
         this.relationshipsRepository = relationshipsRepository;
         this.memoriesRepository = memoriesRepository;
+        this.prisma = prisma;
     }
     async getSeed(characterId) {
         const conversation = await this.conversationsRepository.findByUserAndCharacter("demo-user", characterId);
@@ -37,7 +40,14 @@ let ConversationsService = class ConversationsService {
         const relationship = await this.relationshipsRepository.findByUserAndCharacter("demo-user", characterId);
         const memoryEntries = await this.memoriesRepository.findByUserAndCharacter("demo-user", characterId);
         const allMessages = await this.conversationsRepository.findMessages(conversation.id);
-        const history = allMessages.filter(m => m.role === "user" || m.role === "character").slice(-10).map(m => ({ role: m.role, content: m.content }));
+        // Get last 25 messages for rich context
+        const recentMessages = allMessages.filter(m => m.role === "user" || m.role === "character");
+        const history = recentMessages.slice(-25).map(m => ({ role: m.role, content: m.content }));
+        // Generate a concise history summary
+        const historySummary = this.buildHistorySummary(recentMessages.slice(-10));
+        // Determine stage label
+        const stage = relationship?.stage || "初见";
+        const score = relationship?.score || 0;
         let aiReply = "...";
         let relationshipDelta = 0;
         let memorySummary = null;
@@ -48,10 +58,11 @@ let ConversationsService = class ConversationsService {
                 body: JSON.stringify({
                     character_id: characterId,
                     user_message: content,
-                    relationship_stage: relationship?.stage || "script",
-                    relationship_score: relationship?.score || 0,
+                    relationship_stage: stage,
+                    relationship_score: score,
                     memories: (memoryEntries || []).map(m => m.summary),
                     conversation_history: history,
+                    history_summary: historySummary,
                     api_key: llmConfig?.apiKey || "",
                     base_url: llmConfig?.baseUrl || "",
                     model: llmConfig?.model || ""
@@ -68,18 +79,31 @@ let ConversationsService = class ConversationsService {
             console.warn("AI unavailable:", err);
         }
         await this.conversationsRepository.createMessage(conversation.id, "character", aiReply);
-        if (relationshipDelta !== 0)
-            await this.relationshipsRepository.updateScore("demo-user", characterId, relationshipDelta);
+        await this.relationshipsRepository.updateScore("demo-user", characterId, relationshipDelta);
+        // Store new memory
         if (memorySummary) {
             try {
-                const { PrismaClient } = require("@prisma/client");
-                const p = new PrismaClient();
-                await p.$executeRawUnsafe("INSERT INTO MemoryEntry (id, userId, characterId, summary, weight, createdAt) VALUES (?,?,?,?,1,?)", `mem-${Date.now()}`, "demo-user", characterId, memorySummary, new Date().toISOString());
-                await p.$disconnect();
+                await this.prisma.$executeRawUnsafe("INSERT INTO MemoryEntry (id, userId, characterId, summary, weight, createdAt) VALUES (?,?,?,?,1,?)", "mem-" + Date.now(), "demo-user", characterId, memorySummary, new Date().toISOString());
             }
             catch { }
         }
-        return { characterId, reply: { role: "character", text: aiReply } };
+        return { characterId, reply: { role: "character", text: aiReply }, relationship_delta: relationshipDelta };
+    }
+    async persistMessage(characterId, role, content) {
+        let conversation = await this.conversationsRepository.findByUserAndCharacter("demo-user", characterId);
+        if (!conversation)
+            conversation = await this.conversationsRepository.createConversation("demo-user", characterId);
+        await this.conversationsRepository.createMessage(conversation.id, role, content);
+        return { success: true };
+    }
+    buildHistorySummary(messages) {
+        if (messages.length === 0)
+            return "";
+        const lines = messages.slice(-8).map(m => {
+            const who = m.role === "user" ? "对方" : "我";
+            return who + "：" + m.content.slice(0, 60);
+        });
+        return "最近对话：\n" + lines.join("\n");
     }
 };
 exports.ConversationsService = ConversationsService;
@@ -87,5 +111,6 @@ exports.ConversationsService = ConversationsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [conversations_repository_1.ConversationsRepository,
         relationships_repository_1.RelationshipsRepository,
-        memories_repository_1.MemoriesRepository])
+        memories_repository_1.MemoriesRepository,
+        prisma_service_1.PrismaService])
 ], ConversationsService);

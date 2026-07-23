@@ -1,0 +1,11 @@
+import sqlite3
+conn = sqlite3.connect(r"F:/自媒体/night-nest/apps/api/prisma/dev.db")
+cur = conn.cursor()
+cur.execute("DELETE FROM ScriptMessage WHERE scriptId LIKE 'script-1784787%'")
+cur.execute("DELETE FROM ScriptCharacter WHERE scriptId LIKE 'script-1784787%'")
+cur.execute("DELETE FROM ScriptParticipant WHERE scriptId LIKE 'script-1784787%'")
+cur.execute("DELETE FROM Script WHERE id LIKE 'script-1784787%'")
+cur.execute("DELETE FROM ScriptCharacter WHERE id LIKE 'sc-test%'")
+conn.commit()
+print("Cleaned test data")
+conn.close()

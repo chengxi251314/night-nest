@@ -19,12 +19,15 @@ const story_module_1 = require("./modules/story/story.module");
 const admin_module_1 = require("./modules/admin/admin.module");
 const auth_module_1 = require("./modules/auth/auth.module");
 const script_module_1 = require("./modules/scripts/script.module");
+const forum_module_1 = require("./modules/forum/forum.module");
+const search_module_1 = require("./modules/search/search.module");
+const notification_module_1 = require("./modules/notifications/notification.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [health_module_1.HealthModule, characters_module_1.CharactersModule, conversations_module_1.ConversationsModule, relationships_module_1.RelationshipsModule, memories_module_1.MemoriesModule, story_module_1.StoryModule, admin_module_1.AdminModule, auth_module_1.AuthModule, script_module_1.ScriptModule],
+        imports: [health_module_1.HealthModule, characters_module_1.CharactersModule, conversations_module_1.ConversationsModule, relationships_module_1.RelationshipsModule, memories_module_1.MemoriesModule, story_module_1.StoryModule, admin_module_1.AdminModule, auth_module_1.AuthModule, script_module_1.ScriptModule, forum_module_1.ForumModule, search_module_1.SearchModule, notification_module_1.NotificationModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService]
     })

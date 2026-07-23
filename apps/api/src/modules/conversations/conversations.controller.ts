@@ -21,4 +21,9 @@ export class ConversationsController {
       model: body.model
     });
   }
+
+  @Post(":characterId/persist")
+  persistMessage(@Param("characterId") characterId: string, @Body() body: any) {
+    return this.conversationsService.persistMessage(characterId, body.role, body.content);
+  }
 }

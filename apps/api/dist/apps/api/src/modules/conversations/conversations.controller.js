@@ -30,6 +30,9 @@ let ConversationsController = class ConversationsController {
             model: body.model
         });
     }
+    persistMessage(characterId, body) {
+        return this.conversationsService.persistMessage(characterId, body.role, body.content);
+    }
 };
 exports.ConversationsController = ConversationsController;
 __decorate([
@@ -47,6 +50,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ConversationsController.prototype, "postMessage", null);
+__decorate([
+    (0, common_1.Post)(":characterId/persist"),
+    __param(0, (0, common_1.Param)("characterId")),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], ConversationsController.prototype, "persistMessage", null);
 exports.ConversationsController = ConversationsController = __decorate([
     (0, common_1.Controller)("v1/conversations"),
     __metadata("design:paramtypes", [conversations_service_1.ConversationsService])

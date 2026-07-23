@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { MessageCircle, ScrollText, Users, BarChart3, Sparkles, ChevronRight } from "lucide-react";
+
 import { characters } from "@/lib/data";
 import { CardSkeleton } from "@/components/skeleton";
 
@@ -18,6 +19,21 @@ export default function HomePage() {
   const [ready, setReady] = useState(false);
   useEffect(() => { const t = setTimeout(() => setReady(true), 400); return () => clearTimeout(t); }, []);
 
+  const [allChars, setAllChars] = useState(characters);
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3100";
+  useEffect(() => {
+    fetch(API_BASE + "/v1/characters").then(r => r.json()).then(d => {
+      if (d.items && Array.isArray(d.items)) {
+        const apiOnly = d.items.filter((c: any) => !characters.find(hc => hc.id === c.id));
+        setAllChars([...characters, ...apiOnly.map((c: any) => ({
+          id: c.id, name: c.name || "", title: c.title || "", tagline: c.tagline || "",
+          intro: c.intro || "", world: c.world || "", traits: c.traits || [],
+          stages: c.stages || [], memories: c.memories || [],
+          quickActions: c.quickActions || [], story: c.story || [], imageUrl: c.imageUrl || "",
+        }))]);
+      }
+    }).catch(() => {});
+  }, []);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 22, paddingTop: 6 }}>
       {/* Hero */}
@@ -63,7 +79,7 @@ export default function HomePage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {!ready ? [1, 2, 3, 4].map(i => <CardSkeleton key={i} />) :
-            characters.map((c, i) => {
+            allChars.map((c: any, i: number) => {
               const g = charGradients[c.id] || charGradients.luoyin;
               return (
                 <motion.div key={c.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
@@ -71,7 +87,7 @@ export default function HomePage() {
                     <div style={{ position: "absolute", right: -15, top: -15, width: 100, height: 100, borderRadius: "50%", background: `radial-gradient(circle, ${g.from}15, transparent 70%)` }} />
                     <div style={{ position: "relative", flexShrink: 0 }}>
                       <div style={{ position: "absolute", inset: -2, borderRadius: 16, background: `linear-gradient(135deg, ${g.from}, ${g.to})`, opacity: 0.25, filter: "blur(5px)" }} />
-                      <img src={`/characters/${c.id}.png`} alt="" style={{ width: 64, height: 64, borderRadius: 14, objectFit: "cover", position: "relative", zIndex: 1 }} />
+                      <img src={c.imageUrl || `/characters/${c.id}.png`} alt="" style={{ width: 64, height: 64, borderRadius: 14, objectFit: "cover", position: "relative", zIndex: 1 }} onError={(e: any) => { e.target.src = "/characters/luoyin.png"; }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
                       <div style={{ fontWeight: 700, fontSize: 17 }}>{c.name}</div>
@@ -86,7 +102,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Quick links */}
+      `n`n      {/* Quick links */}
       <div className="grid-2-mobile" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8 }}>
         {[
           { href: "/scripts", Icon: ScrollText, label: "剧本", sub: "加入故事", color: "#8f7cff" },

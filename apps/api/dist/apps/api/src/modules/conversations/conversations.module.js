@@ -14,6 +14,7 @@ const conversations_service_1 = require("./conversations.service");
 const conversations_repository_1 = require("../../database/repositories/conversations.repository");
 const relationships_repository_1 = require("../../database/repositories/relationships.repository");
 const memories_repository_1 = require("../../database/repositories/memories.repository");
+const prisma_service_1 = require("../../database/prisma.service");
 let ConversationsModule = class ConversationsModule {
 };
 exports.ConversationsModule = ConversationsModule;
@@ -21,6 +22,6 @@ exports.ConversationsModule = ConversationsModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [conversations_controller_1.ConversationsController],
-        providers: [conversations_service_1.ConversationsService, conversations_repository_1.ConversationsRepository, relationships_repository_1.RelationshipsRepository, memories_repository_1.MemoriesRepository]
+        providers: [conversations_service_1.ConversationsService, conversations_repository_1.ConversationsRepository, relationships_repository_1.RelationshipsRepository, memories_repository_1.MemoriesRepository, prisma_service_1.PrismaService]
     })
 ], ConversationsModule);

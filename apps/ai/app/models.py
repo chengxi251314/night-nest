@@ -10,6 +10,7 @@ class OrchestrateRequest(BaseModel):
     relationship_score: int = 0
     memories: list[str] = []
     conversation_history: list[dict] = []
+    history_summary: str = ""
     custom_prompt: str = ""
     api_key: str = ""
     base_url: str = ""

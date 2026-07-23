@@ -36,5 +36,5 @@ export default function StarField() {
     return () => window.removeEventListener("resize", resize);
   }, []);
 
-  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }} />;
+  return <canvas ref={canvasRef} suppressHydrationWarning style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }} />;
 }

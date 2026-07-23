@@ -22,24 +22,33 @@ def _llm_available(api_key: str = "") -> bool:
 
 
 def _parse_response(text: str) -> dict:
-    reply = text; delta = 0; memory = None
+    reply = text
+    delta = 0
+    memory = None
     m = re.search(r'\[REPLY\]\s*\n?(.*?)(?=\[DELTA\]|\[MEMORY\]|$)', text, re.DOTALL)
-    if m: reply = m.group(1).strip()
+    if m:
+        reply = m.group(1).strip()
     m = re.search(r'\[DELTA\]\s*\n?([+-]?\d+)', text)
     if m:
-        try: delta = int(m.group(1))
-        except ValueError: pass
+        try:
+            delta = int(m.group(1))
+        except ValueError:
+            pass
     m = re.search(r'\[MEMORY\]\s*\n?(.*?)(?=$)', text, re.DOTALL)
     if m:
         mem = m.group(1).strip()
-        if mem.upper() != "NONE": memory = mem
+        if mem.upper() != "NONE":
+            memory = mem
+    # If no structured tags found, treat whole response as reply
+    if reply == text and "[" not in text[:5]:
+        return {"reply": reply, "delta": 0, "memory": None}
     return {"reply": reply, "delta": delta, "memory": memory}
 
 
 async def chat(
     system_prompt: str,
     user_message: str,
-    conversation_history: list[dict] = [],
+    conversation_history: list = [],
     character_id: str = "",
     api_key: str = "",
     base_url: str = "",
@@ -53,22 +62,38 @@ async def chat(
         return _fallback(character_id, user_message, system_prompt)
 
     messages = [{"role": "system", "content": system_prompt}]
-    for msg in conversation_history[-10:]:
-        role = "assistant" if msg.get("role") == "character" else "user"
-        messages.append({"role": role, "content": msg.get("content", "")})
+
+    # Include up to 25 history messages for deeper context
+    hist = conversation_history[-25:] if len(conversation_history) > 25 else conversation_history
+    for msg in hist:
+        if isinstance(msg, dict):
+            role = "assistant" if msg.get("role") == "character" else "user"
+            content = msg.get("content", "") or msg.get("text", "")
+            if content:
+                messages.append({"role": role, "content": content})
+        elif isinstance(msg, str):
+            messages.append({"role": "assistant", "content": msg})
+
     messages.append({"role": "user", "content": user_message})
 
     try:
         client = OpenAI(api_key=key, base_url=url)
-        resp = client.chat.completions.create(model=mdl, messages=messages, temperature=0.85, max_tokens=300)
-        return _parse_response(resp.choices[0].message.content or "")
+        resp = client.chat.completions.create(
+            model=mdl, messages=messages,
+            temperature=0.85, max_tokens=400
+        )
+        content = resp.choices[0].message.content or ""
+        result = _parse_response(content)
+        if not result["reply"] or result["reply"] == content:
+            result["reply"] = content.strip()
+        return result
     except Exception as e:
-        print(f"LLM error: {e}")
+        print("LLM error: " + str(e))
         return _fallback(character_id, user_message, system_prompt)
 
 
 def _fallback(character_id: str, user_message: str, system_prompt: str = "") -> dict:
-    builtin: dict[str, list[str]] = {
+    builtin = {
         "luoyin": ["你说这些，是想让我在意吗？", "……你还挺会挑话题的。", "我不讨厌你问这个。"],
         "shenye": ["我注意到你在想这件事很久了。", "没关系。我在这里听着。"],
         "qinhuai": ["这个问题比我想象的有深度。", "我在计算你问这个的概率。"],
@@ -78,16 +103,16 @@ def _fallback(character_id: str, user_message: str, system_prompt: str = "") -> 
         pool = builtin.get(character_id, ["嗯。"])
         return {"reply": random.choice(pool), "delta": random.randint(1, 4), "memory": None}
 
+    # Smart fallback: try to pick a style based on prompt keywords
     sp = system_prompt
-    if any(w in sp for w in ["傅衍之", "精神科", "操纵者", "医者"]):
+    if any(w in sp for w in ["精神科", "操纵者", "医者"]):
         pool = ["请坐。不用紧张。这只是聊天。", "你觉得呢？", "我理解。"]
-    elif any(w in sp for w in ["洛因", "魅魔", "魔域"]):
+    elif any(w in sp for w in ["魅魔", "魔域"]):
         pool = ["你胆子不小。", "既然来了，就别着急走。"]
-    elif any(w in sp for w in ["深野", "俱乐部", "夜航"]):
+    elif any(w in sp for w in ["俱乐部", "夜航"]):
         pool = ["先坐下。我去给你倒杯喝的。", "这里很安全。可以放松。"]
-    elif any(w in sp for w in ["秦淮", "实验", "模型", "研究"]):
+    elif any(w in sp for w in ["实验", "模型", "研究"]):
         pool = ["这个问题的变量比我预期的多。", "你的假设很有意思。"]
     else:
         pool = ["（以自定义设定回应你）"]
-
     return {"reply": random.choice(pool), "delta": random.randint(1, 5), "memory": None}

@@ -1,4 +1,4 @@
-﻿export interface HealthDto {
+export interface HealthDto {
   name: string;
   status: "ok";
   date: string;
@@ -42,4 +42,5 @@ export interface ConversationSeedDto {
 export interface ConversationReplyDto {
   characterId: string;
   reply: MessageDto;
+  relationship_delta: number;
 }

@@ -20,6 +20,7 @@ async def orchestrate(request: OrchestrateRequest):
         relationship_score=request.relationship_score,
         memories=request.memories,
         conversation_history=request.conversation_history,
+        history_summary=request.history_summary or "",
         custom_prompt=request.custom_prompt,
         api_key=request.api_key,
         base_url=request.base_url,

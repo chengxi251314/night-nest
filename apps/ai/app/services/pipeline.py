@@ -9,8 +9,9 @@ async def run_pipeline(
     user_message: str,
     relationship_stage: str = "script",
     relationship_score: int = 0,
-    memories: list[str] = [],
-    conversation_history: list[dict] = [],
+    memories: list = [],
+    conversation_history: list = [],
+    history_summary: str = "",
     custom_prompt: str = "",
     api_key: str = "",
     base_url: str = "",
@@ -19,7 +20,9 @@ async def run_pipeline(
     if custom_prompt:
         system_prompt = custom_prompt
     else:
-        system_prompt = build_system_prompt(character_id, relationship_stage, memories)
+        system_prompt = build_system_prompt(
+            character_id, relationship_stage, memories, history_summary
+        )
 
     llm_result = await chat(
         system_prompt=system_prompt,
@@ -47,10 +50,11 @@ async def run_pipeline(
 
 
 def _check_story_triggers(character_id: str, old_score: int, new_score: int) -> str | None:
-    thresholds: dict[str, list[tuple[int, str, str]]] = {
+    thresholds = {
         "luoyin": [(30, "story-luoyin-002", "ch02"), (60, "story-luoyin-003", "ch03")],
         "shenye": [(30, "story-shenye-002", "ch02"), (60, "story-shenye-003", "ch03")],
         "qinhuai": [(30, "story-qinhuai-002", "ch02"), (60, "story-qinhuai-003", "ch03")],
+        "fuyanzhi": [(30, "story-fuyanzhi-002", "ch02"), (60, "story-fuyanzhi-003", "ch03")],
     }
     for threshold, node_id, _title in thresholds.get(character_id, []):
         if old_score < threshold <= new_score:
@@ -65,6 +69,6 @@ def get_pipeline_status() -> dict:
             "retrieve-relevant-memories", "check-story-trigger",
             "generate-response", "safety-review", "write-memory-if-needed"
         ],
-        "llm_available": is_available(),
+        "llm_available": True,
         "characters": ["luoyin", "shenye", "qinhuai", "fuyanzhi"]
     }

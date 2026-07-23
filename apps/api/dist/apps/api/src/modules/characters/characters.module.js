@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharactersModule = void 0;
 const common_1 = require("@nestjs/common");
 const database_module_1 = require("../../database/database.module");
+const prisma_service_1 = require("../../database/prisma.service");
 const characters_controller_1 = require("./characters.controller");
 const characters_service_1 = require("./characters.service");
 const characters_repository_1 = require("../../database/repositories/characters.repository");
@@ -19,6 +20,6 @@ exports.CharactersModule = CharactersModule = __decorate([
     (0, common_1.Module)({
         imports: [database_module_1.DatabaseModule],
         controllers: [characters_controller_1.CharactersController],
-        providers: [characters_service_1.CharactersService, characters_repository_1.CharactersRepository]
+        providers: [characters_service_1.CharactersService, characters_repository_1.CharactersRepository, prisma_service_1.PrismaService]
     })
 ], CharactersModule);
