@@ -48,26 +48,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../database/prisma.service");
+const auth_helper_1 = require("./auth-helper");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
-const tokens = new Map();
-function generateToken() {
-    return "nn_" + Date.now() + "_" + Math.random().toString(36).slice(2, 11);
-}
 const avatarDir = path.resolve(__dirname, "..", "..", "..", "..", "..", "..", "..", "..", "apps", "web", "public", "avatars");
 if (!fs.existsSync(avatarDir))
     fs.mkdirSync(avatarDir, { recursive: true });
 function toUser(row) {
     if (!row)
         return null;
-    return {
-        id: row.id,
-        email: row.email,
-        nickname: row.nickname || "",
-        avatar: row.avatar || "",
-        gender: row.gender || "",
-        bio: row.bio || ""
-    };
+    return { id: row.id, email: row.email, nickname: row.nickname || "", avatar: row.avatar || "", gender: row.gender || "", bio: row.bio || "" };
 }
 let AuthController = class AuthController {
     prisma;
@@ -85,8 +75,7 @@ let AuthController = class AuthController {
             const nickname = body.nickname || body.email.split("@")[0];
             const now = new Date().toISOString();
             await this.prisma.$executeRawUnsafe("INSERT INTO User (id, email, nickname, avatar, gender, bio, createdAt) VALUES (?,?,?,?,?,?,?)", id, body.email, nickname, "", "", "", now);
-            const token = generateToken();
-            tokens.set(token, id);
+            const token = (0, auth_helper_1.generateAuthToken)(id);
             return { token, user: { id, email: body.email, nickname, avatar: "", gender: "", bio: "" } };
         }
         catch {
@@ -104,12 +93,10 @@ let AuthController = class AuthController {
                 const nickname = body.email.split("@")[0];
                 const now = new Date().toISOString();
                 await this.prisma.$executeRawUnsafe("INSERT INTO User (id, email, nickname, avatar, gender, bio, createdAt) VALUES (?,?,?,?,?,?,?)", id, body.email, nickname, "", "", "", now);
-                const token = generateToken();
-                tokens.set(token, id);
+                const token = (0, auth_helper_1.generateAuthToken)(id);
                 return { token, user: { id, email: body.email, nickname, avatar: "", gender: "", bio: "" }, created: true };
             }
-            const token = generateToken();
-            tokens.set(token, user.id);
+            const token = (0, auth_helper_1.generateAuthToken)(user.id);
             return { token, user: toUser(user) };
         }
         catch {
@@ -117,9 +104,8 @@ let AuthController = class AuthController {
         }
     }
     async me(auth) {
-        const token = auth?.replace("Bearer ", "");
-        const userId = token ? tokens.get(token) : null;
-        if (!userId)
+        const userId = (0, auth_helper_1.getUserIdFromAuth)(auth);
+        if (!userId || userId === "demo-user")
             return { user: null };
         try {
             const rows = await this.prisma.$queryRawUnsafe("SELECT * FROM User WHERE id = ?", userId);
@@ -130,9 +116,8 @@ let AuthController = class AuthController {
         }
     }
     async updateProfile(auth, body) {
-        const token = auth?.replace("Bearer ", "");
-        const userId = token ? tokens.get(token) : null;
-        if (!userId)
+        const userId = (0, auth_helper_1.getUserIdFromAuth)(auth);
+        if (!userId || userId === "demo-user")
             return { error: "Not logged in" };
         try {
             const sets = [];
@@ -169,10 +154,7 @@ let AuthController = class AuthController {
             const multer = require("multer");
             const storage = multer.diskStorage({
                 destination: function (_req, _file, cb) { cb(null, avatarDir); },
-                filename: function (_req, file, cb) {
-                    const ext = path.extname(file.originalname) || ".png";
-                    cb(null, "avatar-" + Date.now() + "-" + Math.random().toString(36).slice(2, 5) + ext);
-                }
+                filename: function (_req, file, cb) { const ext = path.extname(file.originalname) || ".png"; cb(null, "avatar-" + Date.now() + "-" + Math.random().toString(36).slice(2, 5) + ext); }
             });
             const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } }).single("file");
             upload(req, res, (err) => {

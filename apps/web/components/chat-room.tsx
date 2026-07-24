@@ -15,6 +15,7 @@ type Message = { role: "system" | "character" | "user"; text: string };
 type Relationship = { characterId: string; score: number; stage: string; mood: string };
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3100";
+function authHeaders() { const t = typeof window !== 'undefined' ? localStorage.getItem('nn_token') : null; return t ? { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' }; }
 
 export default function ChatRoom() {
   const [allChars, setAllChars] = useState<Character[]>(characters);
@@ -72,7 +73,7 @@ export default function ChatRoom() {
         if (!text) text = "...";
         setMessages(p => [...p, { role: "character", text }]);
         // Persist to DB so messages survive page navigation
-        try { await fetch(API + "/v1/conversations/" + char.id + "/persist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ role: "character", content: text }) }); } catch {}
+        try { await fetch(API + "/v1/conversations/" + char.id + "/persist", { method: "POST", headers: authHeaders(), body: JSON.stringify({ role: "character", content: text }) }); } catch {}
         idleCount.current++;
       playPing();
       if (idleCount.current >= 3 && rel) {
@@ -88,9 +89,9 @@ export default function ChatRoom() {
 
   async function load(id: string) {
     try {
-      const a = await fetch(API + "/v1/conversations/" + id + "/seed");
+      const a = await fetch(API + "/v1/conversations/" + id + "/seed", { headers: authHeaders() });
       if (a.ok) setMessages((await a.json()).messages);
-      const b = await fetch(API + "/v1/relationships/" + id);
+      const b = await fetch(API + "/v1/relationships/" + id, { headers: authHeaders() });
       if (b.ok) { const data = await b.json(); setRel(data); }
     } catch {}
   }
@@ -108,7 +109,7 @@ export default function ChatRoom() {
     idleCount.current = 0;
     setMessages(p => [...p, { role: "user", text: v }]);
     try {
-      const r = await fetch(API + "/v1/conversations/" + char.id + "/messages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: v, ...getLLMConfig() }) });
+      const r = await fetch(API + "/v1/conversations/" + char.id + "/messages", { method: "POST", headers: authHeaders(), body: JSON.stringify({ content: v, ...getLLMConfig() }) });
       if (r.ok) {
           const d = await r.json(); setMessages(p => [...p, d.reply]); playPing();
           if (rel) {

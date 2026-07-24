@@ -15,47 +15,52 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConversationsController = void 0;
 const common_1 = require("@nestjs/common");
 const conversations_service_1 = require("./conversations.service");
+const auth_helper_1 = require("../auth/auth-helper");
 let ConversationsController = class ConversationsController {
     conversationsService;
     constructor(conversationsService) {
         this.conversationsService = conversationsService;
     }
-    getSeed(characterId) {
-        return this.conversationsService.getSeed(characterId);
+    getSeed(characterId, auth) {
+        const userId = (0, auth_helper_1.getUserIdFromAuth)(auth);
+        return this.conversationsService.getSeed(characterId, userId);
     }
-    postMessage(characterId, body) {
-        return this.conversationsService.postMessage(characterId, body.content, {
-            apiKey: body.apiKey,
-            baseUrl: body.baseUrl,
-            model: body.model
+    postMessage(characterId, body, auth) {
+        const userId = (0, auth_helper_1.getUserIdFromAuth)(auth);
+        return this.conversationsService.postMessage(characterId, body.content, userId, {
+            apiKey: body.apiKey, baseUrl: body.baseUrl, model: body.model
         });
     }
-    persistMessage(characterId, body) {
-        return this.conversationsService.persistMessage(characterId, body.role, body.content);
+    persistMessage(characterId, body, auth) {
+        const userId = (0, auth_helper_1.getUserIdFromAuth)(auth);
+        return this.conversationsService.persistMessage(characterId, body.role, body.content, userId);
     }
 };
 exports.ConversationsController = ConversationsController;
 __decorate([
     (0, common_1.Get)(":characterId/seed"),
     __param(0, (0, common_1.Param)("characterId")),
+    __param(1, (0, common_1.Headers)("authorization")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], ConversationsController.prototype, "getSeed", null);
 __decorate([
     (0, common_1.Post)(":characterId/messages"),
     __param(0, (0, common_1.Param)("characterId")),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Headers)("authorization")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], ConversationsController.prototype, "postMessage", null);
 __decorate([
     (0, common_1.Post)(":characterId/persist"),
     __param(0, (0, common_1.Param)("characterId")),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Headers)("authorization")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", void 0)
 ], ConversationsController.prototype, "persistMessage", null);
 exports.ConversationsController = ConversationsController = __decorate([

@@ -27,25 +27,22 @@ let ConversationsService = class ConversationsService {
         this.memoriesRepository = memoriesRepository;
         this.prisma = prisma;
     }
-    async getSeed(characterId) {
-        const conversation = await this.conversationsRepository.findByUserAndCharacter("demo-user", characterId);
+    async getSeed(characterId, userId) {
+        const conversation = await this.conversationsRepository.findByUserAndCharacter(userId, characterId);
         const messages = conversation ? await this.conversationsRepository.findMessages(conversation.id) : [];
         return { characterId, messages: messages.map((item) => ({ role: item.role, text: item.content })) };
     }
-    async postMessage(characterId, content, llmConfig) {
-        let conversation = await this.conversationsRepository.findByUserAndCharacter("demo-user", characterId);
+    async postMessage(characterId, content, userId, llmConfig) {
+        let conversation = await this.conversationsRepository.findByUserAndCharacter(userId, characterId);
         if (!conversation)
-            conversation = await this.conversationsRepository.createConversation("demo-user", characterId);
+            conversation = await this.conversationsRepository.createConversation(userId, characterId);
         await this.conversationsRepository.createMessage(conversation.id, "user", content);
-        const relationship = await this.relationshipsRepository.findByUserAndCharacter("demo-user", characterId);
-        const memoryEntries = await this.memoriesRepository.findByUserAndCharacter("demo-user", characterId);
+        const relationship = await this.relationshipsRepository.findByUserAndCharacter(userId, characterId);
+        const memoryEntries = await this.memoriesRepository.findByUserAndCharacter(userId, characterId);
         const allMessages = await this.conversationsRepository.findMessages(conversation.id);
-        // Get last 25 messages for rich context
         const recentMessages = allMessages.filter(m => m.role === "user" || m.role === "character");
         const history = recentMessages.slice(-25).map(m => ({ role: m.role, content: m.content }));
-        // Generate a concise history summary
         const historySummary = this.buildHistorySummary(recentMessages.slice(-10));
-        // Determine stage label
         const stage = relationship?.stage || "初见";
         const score = relationship?.score || 0;
         let aiReply = "...";
@@ -53,19 +50,11 @@ let ConversationsService = class ConversationsService {
         let memorySummary = null;
         try {
             const aiResponse = await fetch(`${AI_SERVICE_URL}/v1/orchestrate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    character_id: characterId,
-                    user_message: content,
-                    relationship_stage: stage,
-                    relationship_score: score,
-                    memories: (memoryEntries || []).map(m => m.summary),
-                    conversation_history: history,
-                    history_summary: historySummary,
-                    api_key: llmConfig?.apiKey || "",
-                    base_url: llmConfig?.baseUrl || "",
-                    model: llmConfig?.model || ""
+                    character_id: characterId, user_message: content, relationship_stage: stage, relationship_score: score,
+                    memories: (memoryEntries || []).map(m => m.summary), conversation_history: history, history_summary: historySummary,
+                    api_key: llmConfig?.apiKey || "", base_url: llmConfig?.baseUrl || "", model: llmConfig?.model || ""
                 })
             });
             if (aiResponse.ok) {
@@ -79,30 +68,26 @@ let ConversationsService = class ConversationsService {
             console.warn("AI unavailable:", err);
         }
         await this.conversationsRepository.createMessage(conversation.id, "character", aiReply);
-        await this.relationshipsRepository.updateScore("demo-user", characterId, relationshipDelta);
-        // Store new memory
+        await this.relationshipsRepository.updateScore(userId, characterId, relationshipDelta);
         if (memorySummary) {
             try {
-                await this.prisma.$executeRawUnsafe("INSERT INTO MemoryEntry (id, userId, characterId, summary, weight, createdAt) VALUES (?,?,?,?,1,?)", "mem-" + Date.now(), "demo-user", characterId, memorySummary, new Date().toISOString());
+                await this.prisma.$executeRawUnsafe("INSERT INTO MemoryEntry (id, userId, characterId, summary, weight, createdAt) VALUES (?,?,?,?,1,?)", "mem-" + Date.now(), userId, characterId, memorySummary, new Date().toISOString());
             }
             catch { }
         }
         return { characterId, reply: { role: "character", text: aiReply }, relationship_delta: relationshipDelta };
     }
-    async persistMessage(characterId, role, content) {
-        let conversation = await this.conversationsRepository.findByUserAndCharacter("demo-user", characterId);
+    async persistMessage(characterId, role, content, userId) {
+        let conversation = await this.conversationsRepository.findByUserAndCharacter(userId, characterId);
         if (!conversation)
-            conversation = await this.conversationsRepository.createConversation("demo-user", characterId);
+            conversation = await this.conversationsRepository.createConversation(userId, characterId);
         await this.conversationsRepository.createMessage(conversation.id, role, content);
         return { success: true };
     }
     buildHistorySummary(messages) {
         if (messages.length === 0)
             return "";
-        const lines = messages.slice(-8).map(m => {
-            const who = m.role === "user" ? "对方" : "我";
-            return who + "：" + m.content.slice(0, 60);
-        });
+        const lines = messages.slice(-8).map(m => { const who = m.role === "user" ? "对方" : "我"; return who + "：" + m.content.slice(0, 60); });
         return "最近对话：\n" + lines.join("\n");
     }
 };

@@ -15,21 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RelationshipsController = void 0;
 const common_1 = require("@nestjs/common");
 const relationships_service_1 = require("./relationships.service");
+const auth_helper_1 = require("../auth/auth-helper");
 let RelationshipsController = class RelationshipsController {
     relationshipsService;
     constructor(relationshipsService) {
         this.relationshipsService = relationshipsService;
     }
-    findOne(characterId) {
-        return this.relationshipsService.findOne(characterId);
+    findOne(characterId, auth) {
+        const userId = (0, auth_helper_1.getUserIdFromAuth)(auth);
+        return this.relationshipsService.findOne(characterId, userId);
     }
 };
 exports.RelationshipsController = RelationshipsController;
 __decorate([
     (0, common_1.Get)(":characterId"),
     __param(0, (0, common_1.Param)("characterId")),
+    __param(1, (0, common_1.Headers)("authorization")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], RelationshipsController.prototype, "findOne", null);
 exports.RelationshipsController = RelationshipsController = __decorate([

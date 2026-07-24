@@ -17,8 +17,8 @@ let RelationshipsService = class RelationshipsService {
     constructor(relationshipsRepository) {
         this.relationshipsRepository = relationshipsRepository;
     }
-    async findOne(characterId) {
-        const state = await this.relationshipsRepository.findByUserAndCharacter("demo-user", characterId);
+    async findOne(characterId, userId) {
+        const state = await this.relationshipsRepository.findByUserAndCharacter(userId, characterId);
         return state ?? { characterId, score: 0, stage: "未知", mood: "未知" };
     }
 };
