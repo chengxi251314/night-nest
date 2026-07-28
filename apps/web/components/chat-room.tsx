@@ -8,14 +8,15 @@ import TheaterPlayer from "@/components/theater-player";
 import { theaters } from "@/lib/theater-data";
 import InvitationFlow from "@/components/invitation-flow";
 import { invitations } from "@/lib/invitations";
-import BadgeUnlock, { checkBadge, resetBadges } from "@/components/badge-unlock";
+import BadgeUnlock, { checkBadges, resetBadges } from "@/components/badge-unlock";
 import { playPing, playUnlock } from "@/lib/sounds";
 
 type Message = { role: "system" | "character" | "user"; text: string };
 type Relationship = { characterId: string; score: number; stage: string; mood: string };
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3100";
-function authHeaders() { const t = typeof window !== 'undefined' ? localStorage.getItem('nn_token') : null; return t ? { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' }; }
+const API = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+function getOrCreateToken() { if (typeof window === 'undefined') return 'anon'; let t = localStorage.getItem('nn_token'); if (!t) { t = 'anon_' + Math.random().toString(36).slice(2, 8); localStorage.setItem('nn_token', t); } return t; }
+function authHeaders() { return { Authorization: 'Bearer ' + getOrCreateToken(), 'Content-Type': 'application/json' }; }
 
 export default function ChatRoom() {
   const [allChars, setAllChars] = useState<Character[]>(characters);
@@ -64,9 +65,9 @@ export default function ChatRoom() {
       const cfg = getLLMConfig();
       let text = "";
       try {
-        const r = await fetch("http://localhost:8000/v1/orchestrate", {
+        const r = await fetch(API + "/v1/orchestrate", {
           method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ character_id: char.id, user_message: "请根据你们之前的对话内容，以角色性格自然地主动说一句话。要贴合之前聊的话题，不要重复说过的话。1-2句话即可。", memories: [], conversation_history: messages.slice(-6).map(function(m) { return { role: m.role, content: m.text }; }), relationship_stage: rel?.stage || "", relationship_score: rel?.score || 0, api_key: cfg.apiKey, base_url: cfg.baseUrl, model: cfg.model })
+            body: JSON.stringify({ character_id: char.id, user_message: "请根据你们之前的对话内容，以角色性格自然地主动说一句话。要贴合之前聊的话题，不要重复说过的话�?-2句话即可�?, memories: [], conversation_history: messages.slice(-6).map(function(m) { return { role: m.role, content: m.text }; }), relationship_stage: rel?.stage || "", relationship_score: rel?.score || 0, api_key: cfg.apiKey, base_url: cfg.baseUrl, model: cfg.model })
         });
         if (r.ok) { const d = await r.json(); text = d.reply || ""; }
       } catch {}
@@ -121,7 +122,7 @@ export default function ChatRoom() {
           setFlash(delta); setTimeout(() => setFlash(null), 1500);
           checkInvites(ps, ns);
           if (ns >= 92 && ps < 92) setTimeout(() => setShowTheater(true), 800);
-          const bg = checkBadge(char.name, ps, ns); if (bg) { setBadge(bg); playUnlock(); }
+          const bg = checkBadges(char.name, ps, ns); if (bg) { setBadge(bg); playUnlock(); }
           setRel({ ...rel, score: ns });
         }
         if (Math.random() < 0.4) setTimeout(async () => {
@@ -161,8 +162,8 @@ export default function ChatRoom() {
         <div ref={ref} />
       </div>
       <div style={{ display: "flex", gap: 8, paddingTop: 8 }}>
-        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder={`对${char.name}说点什么...`} disabled={loading} style={{ flex: 1, padding: "13px 18px", borderRadius: 24, border: `1px solid ${t.light}`, background: "rgba(14,14,36,0.7)", color: ds.color.text, fontSize: 14 }} />
-        <button onClick={send} disabled={loading} style={{ padding: "13px 20px", borderRadius: 24, background: `linear-gradient(135deg, ${t.main}, ${t.main}cc)`, color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: `0 4px 20px ${t.glow}` }}>发送</button>
+        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder={`�?{char.name}说点什�?..`} disabled={loading} style={{ flex: 1, padding: "13px 18px", borderRadius: 24, border: `1px solid ${t.light}`, background: "rgba(14,14,36,0.7)", color: ds.color.text, fontSize: 14 }} />
+        <button onClick={send} disabled={loading} style={{ padding: "13px 20px", borderRadius: 24, background: `linear-gradient(135deg, ${t.main}, ${t.main}cc)`, color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: `0 4px 20px ${t.glow}` }}>发�?/button>
       </div>
       {showTheater && theaters[char.id] && <TheaterPlayer characterId={char.id} characterName={char.name} scenes={theaters[char.id].scenes} startScene={theaters[char.id].start} onClose={() => setShowTheater(false)} />}
       {activeInvitation && <InvitationFlow invitation={activeInvitation} characterName={char.name} accentColor={t.main} onClose={() => setActiveInvitation(null)} onScoreChange={(delta: number) => { if (rel) { const ps = rel.score; const ns = Math.min(100, Math.max(0, rel.score + delta)); setFlash(delta); setTimeout(() => setFlash(null), 2000); setRel({ ...rel, score: ns }); } }} />}
